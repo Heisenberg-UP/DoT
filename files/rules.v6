@@ -1,0 +1,14 @@
+# Block all IPv6 Traffic
+
+* filter
+
+# Input Table
+-A INPUT -m comment --comment "Block all incoming traffic" -j REJECT
+
+# Forward Table
+-A FORWARD -m comment --comment "Block all forwarded traffic" -j REJECT
+
+# Output Table
+-A OUTPUT -m comment --comment "Block all outgoing traffic" -j REJECT
+
+COMMIT
