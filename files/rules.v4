@@ -1,0 +1,46 @@
+*filter
+
+# Allow all loopback (lo) traffic and reject anything
+# to localhost that does not originate from lo.
+-A INPUT -i lo -m comment --comment "Allow incoming loopback traffic" -j ACCEPT
+-A INPUT ! -i lo -s 127.0.0.0/8 -m comment --comment "Reject unkown loopback traffic" -j REJECT
+-A OUTPUT -o lo -m comment --comment "Allow outgoing loopback traffic" -j ACCEPT
+
+# Allow ping and ICMP error returns.
+-A INPUT -p icmp -m state --state NEW --icmp-type 8 -m comment --comment "Allow incoming ICMP traffic" -j ACCEPT
+-A INPUT -p icmp -m state --state ESTABLISHED,RELATED -m comment --comment "Allow established incoming ICMP traffic" -j ACCEPT
+-A OUTPUT -p icmp -m comment --comment "Allow outgoing ICMP traffic" -j ACCEPT
+
+# Allow SSH.
+-A INPUT -i eth0 -p tcp -m state --state NEW,ESTABLISHED --dport 22 -m comment --comment "Allow incoming traffic for SSH" -j ACCEPT
+-A OUTPUT -o eth0 -p tcp -m state --state ESTABLISHED --sport 22 -m comment --comment "Allow outgoing traffic for SSH" -j ACCEPT
+
+# Allow DNS over TLS with safe DNS resolvers
+-A INPUT -i eth0 -p tcp -m state --state ESTABLISHED --sport 853 -m comment --comment "Allow established incoming traffic for DoT" -j ACCEPT
+-A OUTPUT -o eth0 -p tcp -m state --state NEW,ESTABLISHED --dport 853 -m comment --comment "Allow outgoing traffic for DoT" -j ACCEPT
+
+# Allow port 53 for system boot. This is required to establish systemd-resolved and chrony when security reboots occur
+-A INPUT -i eth0 -p udp --dport 53 -m comment --comment "Allow incoming udp DNS traffic" -j ACCEPT
+-A INPUT -i eth0 -p tcp -m state --state ESTABLISHED --dport 53 -m comment --comment "Allow incoming tcp DNS traffic" -j ACCEPT
+-A OUTPUT -o eth0 -p udp --sport 53 -m comment --comment "Allow outgoing udp DNS traffic" -j ACCEPT
+-A OUTPUT -o eth0 -p tcp -m state --state NEW,ESTABLISHED --sport 53 -m comment --comment "Allow outgoing tcp DNS traffic" -j ACCEPT
+
+# Allow limited HTTP/S on eth0
+# Necessary for updating the server and timekeeping
+-A INPUT -i eth0 -p tcp -m state --state ESTABLISHED --sport 80 -m comment --comment "Allow incoming traffic for HTTP" -j ACCEPT
+-A INPUT -i eth0 -p tcp -m state --state ESTABLISHED --sport 443 -m comment --comment "Allow incoming traffic for HTTPS" -j ACCEPT
+-A OUTPUT -o eth0 -p tcp -m state --state NEW,ESTABLISHED --dport 80 -m comment --comment "Allow outgoing traffic for HTTP" -j ACCEPT
+-A OUTPUT -o eth0 -p tcp -m state --state NEW,ESTABLISHED --dport 443 -m comment --comment "Allow outgoing traffic for HTTPS" -j ACCEPT
+
+# Log any packets which don't fit the rules above.
+# (optional but useful)
+-A INPUT -m limit --limit 3/min -j LOG --log-prefix "iptables_INPUT_denied: " --log-level 4
+-A FORWARD -m limit --limit 3/min -j LOG --log-prefix "iptables_FORWARD_denied: " --log-level 4
+-A OUTPUT -m limit --limit 3/min -j LOG --log-prefix "iptables_OUTPUT_denied: " --log-level 4
+
+# then reject them.
+-A INPUT -j REJECT
+-A FORWARD -j REJECT
+-A OUTPUT -j REJECT
+
+COMMIT
