@@ -4,7 +4,7 @@ sudo python3 ~/DoT-AdBlock/files/adblock-script > ~/DoT-AdBlock/files/adblock.co
 
 sudo cp ~/DoT-AdBlock/files/adblock.conf /etc/unbound/unbound.conf.d/adblock.conf
 
-sudo chown $user:$user ~/DoT-AdBlock/files/adblock.conf
+sudo chown whoami:whoami ~/DoT-AdBlock/files/adblock.conf
 
 sudo chmod 400 ~/DoT-AdBlock/files/adblock.conf
 
