@@ -6,14 +6,14 @@ user=$(whoami)
 
 # Install necessary packages
 sudo apt-get update -y && sudo apt-get upgrade -y
-sudo apt-get install ngrep systemd-resolved -y
+sudo apt-get install ngrep unbound -y
 
 # Move vanilla resolved configuration file to DoT folder
-sudo mv /etc/systemd/resolved.conf $dir/DoT/files/resolved.conf.original
-sudo chown $user:$user $dir/DoT/files/resolved.conf.original
-chmod 600 $dir/DoT/files/resolved.conf.original
+sudo cp /etc/unbound/unbound.conf $dir/DoT-AdBlock/files/unbound.conf.original
+sudo chown $user:$user $dir/DoT-AdBlock/files/unbound.conf.original
+chmod 400 $dir/DoT-AdBlock/files/resolved.conf.original
 
 # Copy custom resolved configuation file to /etc/systemd/ folder
-sudo cp $dir/DoT/files/resolved.conf /etc/systemd/resolved.conf
-sudo chmod 644 ~/etc/systemd/resolved.conf
+sudo cp $dir/DoT-AdBlock/files/unbound.conf /etc/unbound/unbound.conf
+sudo chmod 644 /etc/unbound/unbound.conf
 
