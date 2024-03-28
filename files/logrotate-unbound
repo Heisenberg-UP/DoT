@@ -1,0 +1,14 @@
+# This file will be placed in /etc/logrotate.d/ folder, the purpose is to rotate log files every day and save 7 compressed files
+# The service will be restarted everytime this runs for healthy operation of the service and logging features.
+
+
+/var/log/unbound.log {
+    daily
+    rotate 7
+    missingok
+    create 0640
+    su unbound adm
+    postrotate
+        /bin/systemctl restart unbound.service >/dev/null 2>&1 || true
+    endscript
+}
