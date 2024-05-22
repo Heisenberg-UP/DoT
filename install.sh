@@ -32,6 +32,4 @@ sudo chmod 644 /etc/apparmor.d/local/usr.sbin.unbound
 sudo iptables -F
 sudo systemctl try-restart unbound
 
-
-
-
+# TEST TEST
